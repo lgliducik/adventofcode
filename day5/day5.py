@@ -8,17 +8,17 @@ class Interval:
     range: int
 
     def convert_number(self, number) -> int:
-        return self.dest_start + (number - self.source_start)
+        return number + (self.dest_start - self.source_start)
 
     def number_in_interval(self, number) -> bool:
-        return (number > self.dest_start) and (number < self.source_start + self.range)
+        return (number >= self.source_start) and (number < self.source_start + self.range)
 
 
 @dataclass
 class Convert:
     destination: str
     source: str
-    list_of_interval: list
+    list_of_interval: list[Interval]
 
     def convert(self, number):
         for interval in self.list_of_interval:
@@ -32,8 +32,8 @@ class Convert:
 
 
 def line_to_interval(line: str) -> Interval:
-    source_start, dest_start, rang = line.split()
-    interval = Interval(int(source_start), int(dest_start), int(rang))
+    dest_start, source_start, rang = line.split()
+    interval = Interval(int(dest_start), int(source_start), int(rang))
     return interval
 
 
@@ -50,7 +50,7 @@ def block_to_convert(block: str) -> Convert:
         else:
             interval = line_to_interval(line_)
             convert.list_of_interval.append(interval)
-    print(convert)
+    # print(convert)
     return convert
 
 
@@ -61,18 +61,20 @@ def main():
         blocks = all_file.split("\n\n")
         seeds_str = blocks[0].rstrip("\n").split(":")[1].split()
         seeds = [int(i) for i in seeds_str]
-        print(seeds)
+        # print(seeds)
 
+        convert_list = []
         for block in blocks[1:]:
-            print(block)
-            convert_list = []
+            # print(block)
+
             convert_list.append(block_to_convert(block))
 
-        for seed in seeds:
-            seed_start = seed
+        for number in seeds:
             for convert in convert_list:
-                seed_start = convert.convert(seed_start)
-            result_list_location.append(seed_start)
+                number = convert.convert(number)
+                print(f"number = {number}")
+            result_list_location.append(number)
+        print(result_list_location)
         print(min(result_list_location))
         return min(result_list_location)
 
